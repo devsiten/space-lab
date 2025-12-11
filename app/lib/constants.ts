@@ -21,7 +21,7 @@ export const BONDING_CURVE_PARAMS = {
 };
 
 // Token Creation
-export const TOKEN_CREATION_FEE = 0.02 * LAMPORTS_PER_SOL; // 0.02 SOL
+export const TOKEN_CREATION_FEE = 0; // Free to launch
 export const MAX_NAME_LENGTH = 32;
 export const MAX_SYMBOL_LENGTH = 10;
 export const MAX_DESCRIPTION_LENGTH = 500;

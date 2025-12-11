@@ -136,7 +136,7 @@ export default function CreateTokenPage() {
         <div className="bg-[#131314] border border-[#1F1F22] rounded-2xl p-8">
           <h1 className="text-3xl font-bold text-white mb-2">Create a new token</h1>
           <p className="text-gray-400 mb-8">
-            Launch fee: 0.02 SOL • Deployed with our authority • Appears on Pump.fun
+            Launch free • Your token goes live instantly
           </p>
 
           <div className="space-y-6">
@@ -295,7 +295,7 @@ export default function CreateTokenPage() {
                   Creating token...
                 </span>
               ) : connected ? (
-                'Create Token (0.02 SOL)'
+                'Create Token'
               ) : (
                 'Connect Wallet to Continue'
               )}

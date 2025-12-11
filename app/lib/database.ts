@@ -55,7 +55,7 @@ export async function getTokensByCategory(
     case 'hot':
       query = sql`
         SELECT * FROM tokens 
-        WHERE graduated = false 
+        WHERE platform = 'Space Lab' AND graduated = false 
         ORDER BY volume_24h DESC, market_cap DESC 
         LIMIT ${limit}
       `;
@@ -63,6 +63,7 @@ export async function getTokensByCategory(
     case 'new':
       query = sql`
         SELECT * FROM tokens 
+        WHERE platform = 'Space Lab'
         ORDER BY created_at DESC 
         LIMIT ${limit}
       `;
@@ -70,7 +71,7 @@ export async function getTokensByCategory(
     case 'graduating':
       query = sql`
         SELECT * FROM tokens 
-        WHERE graduated = false 
+        WHERE platform = 'Space Lab' AND graduated = false 
         AND market_cap >= 50000 
         ORDER BY market_cap DESC 
         LIMIT ${limit}
@@ -84,7 +85,7 @@ export async function getTokensByCategory(
             ELSE 0 
           END as change_24h
         FROM tokens 
-        WHERE price_24h_ago > 0 
+        WHERE platform = 'Space Lab' AND price_24h_ago > 0 
         ORDER BY change_24h DESC 
         LIMIT ${limit}
       `;
@@ -92,6 +93,7 @@ export async function getTokensByCategory(
     case 'volume':
       query = sql`
         SELECT * FROM tokens 
+        WHERE platform = 'Space Lab'
         ORDER BY volume_24h DESC 
         LIMIT ${limit}
       `;
@@ -99,6 +101,7 @@ export async function getTokensByCategory(
     default:
       query = sql`
         SELECT * FROM tokens 
+        WHERE platform = 'Space Lab'
         ORDER BY market_cap DESC 
         LIMIT ${limit}
       `;

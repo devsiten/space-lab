@@ -43,7 +43,7 @@ export default function TokenPage() {
 
       try {
         const res = await fetch(
-          `https://api.dexscreener.com/tokens/v1/solana/${mint}`
+          `https://api.dexscreener.com/latest/dex/tokens/${mint}`
         );
 
         if (!res.ok) {
@@ -52,12 +52,12 @@ export default function TokenPage() {
 
         const data = await res.json();
 
-        if (!data || data.length === 0) {
+        if (!data || !data.pairs || data.pairs.length === 0) {
           throw new Error('Token not found');
         }
 
-        // Get the first/best pair
-        const pair = data[0];
+        // Get the first Solana pair
+        const pair = data.pairs.find((p: any) => p.chainId === 'solana') || data.pairs[0];
 
         setToken({
           mint: pair.baseToken?.address || mint,

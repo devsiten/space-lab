@@ -141,12 +141,6 @@ export default function HomePage() {
               >
                 <span>🚀</span> Launch Token
               </Link>
-              <button
-                onClick={() => router.push('/how-it-works')}
-                className="bg-[#131314] border border-[#1F1F22] hover:border-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all"
-              >
-                How it Works
-              </button>
             </div>
           </div>
         </div>

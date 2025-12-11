@@ -15,6 +15,7 @@ interface TokenCardProps {
     price24hAgo: number;
     marketCap: number;
     volume24h: number;
+    liquidity?: number;
     holders: number;
     txns24h?: number;
     createdAt: string;
@@ -171,7 +172,7 @@ export function TokenCard({ token, rank }: TokenCardProps) {
                 Vol: <span className="text-white font-bold">${formatNumber(token.volume24h)}</span>
               </span>
             )}
-            {token.liquidity > 0 && (
+            {token.liquidity && token.liquidity > 0 && (
               <span className="text-gray-500 flex items-center gap-1">
                 Liq: <span className="text-white font-bold">${formatNumber(token.liquidity)}</span>
               </span>

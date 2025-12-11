@@ -1,0 +1,26 @@
+{
+  "functions": {
+    "app/api/launch/create/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/trade/buy/route.ts": {
+      "maxDuration": 10
+    },
+    "app/api/trade/sell/route.ts": {
+      "maxDuration": 10
+    },
+    "app/api/trade/quote/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/update-prices",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/claim-fees",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

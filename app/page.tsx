@@ -47,8 +47,8 @@ export default function HomePage() {
   const fetchTokens = async (category: string) => {
     setLoading(true);
     try {
-      // Fetch directly from Pump.fun-backed endpoint
-      const res = await fetch(`/api/pumpfun/trending?category=${category}&limit=30`);
+      // Fetch directly from DexScreener-backed endpoint
+      const res = await fetch(`/api/trending?category=${category}&limit=30`);
       if (res.ok) {
         const data = await res.json();
         setTokens(data);

@@ -22,16 +22,11 @@ export async function GET() {
       });
 
     } catch (dbError) {
-      console.warn('Database not configured, returning zero stats');
-
-      // Return zeros - no mock data
-      return NextResponse.json({
-        totalVolume: 0,
-        totalTokens: 0,
-        totalTraders: 0,
-        totalEarnings: 0,
-        volumeChange: 0,
-      });
+      console.error('Database not configured or query failed:', dbError);
+      return NextResponse.json(
+        { error: 'Database unavailable for stats' },
+        { status: 502 }
+      );
     }
 
   } catch (error: any) {

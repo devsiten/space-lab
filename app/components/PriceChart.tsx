@@ -12,6 +12,7 @@ export function PriceChart({ tokenAddress, height = 400 }: PriceChartProps) {
   const chartRef = useRef<any>(null);
   const [timeframe, setTimeframe] = useState('1H');
   const [loading, setLoading] = useState(true);
+  const [hasData, setHasData] = useState(false);
 
   const timeframes = ['1M', '5M', '15M', '1H', '4H', '1D'];
 
@@ -54,7 +55,7 @@ export function PriceChart({ tokenAddress, height = 400 }: PriceChartProps) {
 
         chartRef.current = chart;
 
-        // Add candlestick series
+        // TODO: plug real OHLCV data source; for now, do not render mock data
         const candlestickSeries = chart.addCandlestickSeries({
           upColor: '#10B981',
           downColor: '#EF4444',
@@ -64,36 +65,9 @@ export function PriceChart({ tokenAddress, height = 400 }: PriceChartProps) {
           wickUpColor: '#10B981',
         });
 
-        // Generate sample data (in production, fetch from API)
-        const data = generateSampleData();
-        candlestickSeries.setData(data);
-
-        // Add volume series
-        const volumeSeries = chart.addHistogramSeries({
-          color: '#7C3AED',
-          priceFormat: {
-            type: 'volume',
-          },
-          priceScaleId: '',
-        });
-
-        volumeSeries.priceScale().applyOptions({
-          scaleMargins: {
-            top: 0.8,
-            bottom: 0,
-          },
-        });
-
-        const volumeData = data.map(item => ({
-          time: item.time,
-          value: Math.random() * 1000000,
-          color: item.close >= item.open ? '#10B98133' : '#EF444433',
-        }));
-
-        volumeSeries.setData(volumeData);
-
-        // Fit content
-        chart.timeScale().fitContent();
+        // Without a live OHLCV source, leave series empty
+        candlestickSeries.setData([]);
+        setHasData(false);
 
         // Handle resize
         const handleResize = () => {
@@ -166,39 +140,13 @@ export function PriceChart({ tokenAddress, height = 400 }: PriceChartProps) {
             </svg>
           </div>
         )}
+        {!loading && !hasData && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#131314] text-gray-500 text-sm">
+            No price data yet.
+          </div>
+        )}
         <div ref={containerRef} style={{ height }} />
       </div>
     </div>
   );
-}
-
-// Generate sample candlestick data
-function generateSampleData() {
-  const data = [];
-  let basePrice = 0.00001;
-  const now = Math.floor(Date.now() / 1000);
-  const interval = 60 * 60; // 1 hour
-
-  for (let i = 100; i >= 0; i--) {
-    const time = now - i * interval;
-    const volatility = 0.05;
-    const change = (Math.random() - 0.5) * volatility;
-    
-    const open = basePrice;
-    const close = basePrice * (1 + change);
-    const high = Math.max(open, close) * (1 + Math.random() * 0.02);
-    const low = Math.min(open, close) * (1 - Math.random() * 0.02);
-    
-    data.push({
-      time: time as any,
-      open,
-      high,
-      low,
-      close,
-    });
-    
-    basePrice = close;
-  }
-
-  return data;
 }

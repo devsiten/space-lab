@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { formatNumber, formatPrice, getTimeAgo, shortenAddress, generateSparklineData, calculateChange } from '@/lib/utils';
+import { formatNumber, formatPrice, getTimeAgo, shortenAddress, calculateChange } from '@/lib/utils';
 import { BONDING_CURVE_PARAMS } from '@/lib/constants';
 
 interface TokenCardProps {
@@ -28,13 +28,9 @@ interface TokenCardProps {
 
 export function TokenCard({ token, rank }: TokenCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [sparklineData, setSparklineData] = useState<number[]>([]);
   const [livePrice, setLivePrice] = useState(token.price);
 
   useEffect(() => {
-    // Generate sparkline data
-    setSparklineData(generateSparklineData(token.price, 20, 0.1));
-
     // WebSocket for real-time price updates
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_WS_URL) {
       try {
@@ -62,7 +58,7 @@ export function TokenCard({ token, rank }: TokenCardProps) {
   return (
     <Link href={`/token/${token.mint}`}>
       <div
-        className="glass-card relative rounded-2xl p-6 group h-full flex flex-col"
+        className="glass-card relative rounded-2xl p-4 group h-full flex flex-col"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -90,38 +86,7 @@ export function TokenCard({ token, rank }: TokenCardProps) {
           </div>
         )}
 
-        {/* Mini Chart */}
-        <div className="h-24 mb-6 -mx-6 mt-[-1rem] relative opacity-60 group-hover:opacity-100 transition-opacity">
-          <svg className="w-full h-full" viewBox="0 0 200 60" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id={`gradient-${token.mint}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={priceChange >= 0 ? '#10B981' : '#EF4444'} stopOpacity="0.2" />
-                <stop offset="100%" stopColor={priceChange >= 0 ? '#10B981' : '#EF4444'} stopOpacity="0" />
-              </linearGradient>
-            </defs>
-
-            {sparklineData.length > 0 && (
-              <>
-                <path
-                  d={`M 0,60 L 0,${60 - (sparklineData[0] / Math.max(...sparklineData)) * 50} ${sparklineData.map((price, i) =>
-                    `L ${(i / (sparklineData.length - 1)) * 200},${60 - (price / Math.max(...sparklineData)) * 50}`
-                  ).join(' ')
-                    } L 200,60 Z`}
-                  fill={`url(#gradient-${token.mint})`}
-                />
-
-                <polyline
-                  fill="none"
-                  stroke={priceChange >= 0 ? '#10B981' : '#EF4444'}
-                  strokeWidth="2"
-                  points={sparklineData.map((price, i) =>
-                    `${(i / (sparklineData.length - 1)) * 200},${60 - (price / Math.max(...sparklineData)) * 50}`
-                  ).join(' ')}
-                />
-              </>
-            )}
-          </svg>
-        </div>
+        {/* Mini Chart removed – awaiting real historical data source */}
 
         {/* Token Info */}
         <div className="flex items-start justify-between mb-4 relative z-10">
@@ -131,11 +96,11 @@ export function TokenCard({ token, rank }: TokenCardProps) {
                 <img
                   src={token.image}
                   alt={token.name}
-                  className="w-12 h-12 rounded-xl object-cover ring-2 ring-white/5 group-hover/image:ring-violet-500/50 transition-all shadow-lg"
+                  className="w-10 h-10 rounded-xl object-cover ring-2 ring-white/5 group-hover/image:ring-violet-500/50 transition-all shadow-lg"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center ring-2 ring-white/5 shadow-lg shadow-violet-600/20">
-                  <span className="text-white font-bold text-lg">{token.symbol.charAt(0)}</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center ring-2 ring-white/5 shadow-lg shadow-violet-600/20">
+                  <span className="text-white font-bold text-base">{token.symbol.charAt(0)}</span>
                 </div>
               )}
               {token.verified && (

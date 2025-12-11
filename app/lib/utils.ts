@@ -107,25 +107,6 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * Generate sparkline data points for visualization
- */
-export function generateSparklineData(
-  basePrice: number,
-  points: number = 20,
-  volatility: number = 0.1
-): number[] {
-  const data: number[] = [];
-  let currentPrice = basePrice;
-  
-  for (let i = 0; i < points; i++) {
-    currentPrice = currentPrice * (1 + (Math.random() - 0.5) * volatility);
-    data.push(currentPrice);
-  }
-  
-  return data;
-}
-
-/**
  * Debounce function
  */
 export function debounce<T extends (...args: any[]) => any>(

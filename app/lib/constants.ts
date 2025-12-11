@@ -22,6 +22,7 @@ export const BONDING_CURVE_PARAMS = {
 
 // Token Creation
 export const TOKEN_CREATION_FEE = 0; // Free to launch
+export const FIRST_BUYER_FEE = 0.015 * LAMPORTS_PER_SOL; // 0.015 SOL protocol fee for first buyer
 export const MAX_NAME_LENGTH = 32;
 export const MAX_SYMBOL_LENGTH = 10;
 export const MAX_DESCRIPTION_LENGTH = 500;

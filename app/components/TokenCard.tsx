@@ -179,26 +179,24 @@ export function TokenCard({ token, rank }: TokenCardProps) {
 
         {/* Quick Actions (visible on hover) */}
         <div className={`grid grid-cols-2 gap-3 transition-all duration-300 transform ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'} relative z-20`}>
-          <button
+          <Link
+            href={`/token/${token.mint}?action=buy`}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              window.open(`/token/${token.mint}?action=buy`, '_blank');
             }}
-            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-emerald-300 py-2.5 rounded-xl text-xs font-bold transition-all border border-emerald-500/20 hover:border-emerald-500/40"
+            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-emerald-300 py-2.5 rounded-xl text-xs font-bold transition-all border border-emerald-500/20 hover:border-emerald-500/40 text-center"
           >
             Quick Buy
-          </button>
-          <button
+          </Link>
+          <Link
+            href={`/token/${token.mint}`}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              window.open(`/token/${token.mint}`, '_blank');
             }}
-            className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 hover:text-violet-300 py-2.5 rounded-xl text-xs font-bold transition-all border border-violet-500/20 hover:border-violet-500/40"
+            className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 hover:text-violet-300 py-2.5 rounded-xl text-xs font-bold transition-all border border-violet-500/20 hover:border-violet-500/40 text-center"
           >
             View Chart
-          </button>
+          </Link>
         </div>
 
         {/* Footer info */}

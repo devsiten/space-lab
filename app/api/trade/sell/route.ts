@@ -7,7 +7,8 @@ const PLATFORM_FEE_BPS = 50;
 
 export async function POST(request: Request) {
   try {
-    const { tokenAddress, amount, userWallet } = await request.json();
+    const body = await request.json();
+    const { tokenAddress, amount, userWallet } = body;
 
     if (!tokenAddress || !amount || !userWallet) {
       return NextResponse.json(
@@ -16,60 +17,65 @@ export async function POST(request: Request) {
       );
     }
 
-    // SELL: Token -> SOL (this was wrong in your original code!)
-    const quoteUrl = new URL(JUPITER_QUOTE_API);
-    quoteUrl.searchParams.set('inputMint', tokenAddress);  // Token IN
-    quoteUrl.searchParams.set('outputMint', SOL_MINT);     // SOL OUT
-    quoteUrl.searchParams.set('amount', amount.toString());
-    quoteUrl.searchParams.set('slippageBps', '100');
-    quoteUrl.searchParams.set('platformFeeBps', PLATFORM_FEE_BPS.toString());
+    // Get quote (Token -> SOL)
+    const quoteUrl = `${JUPITER_QUOTE_API}?inputMint=${tokenAddress}&outputMint=${SOL_MINT}&amount=${amount}&slippageBps=100&platformFeeBps=${PLATFORM_FEE_BPS}`;
 
-    const quoteResponse = await fetch(quoteUrl.toString());
+    const quoteResponse = await fetch(quoteUrl, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!quoteResponse.ok) {
+      console.error('Jupiter quote error:', await quoteResponse.text());
+      return NextResponse.json(
+        { error: 'Failed to get quote' },
+        { status: 502 }
+      );
+    }
+
     const quote = await quoteResponse.json();
 
-    if (!quoteResponse.ok || quote.error) {
-      throw new Error(quote.error || 'Failed to get quote from Jupiter');
+    if (quote.error) {
+      return NextResponse.json({ error: quote.error }, { status: 400 });
     }
 
-    const swapBody: any = {
-      quoteResponse: quote,
-      userPublicKey: userWallet,
-      wrapAndUnwrapSol: true,
-      dynamicComputeUnitLimit: true,
-      prioritizationFeeLamports: 'auto',
-    };
-
-    const referralAccount = process.env.JUPITER_REFERRAL_ACCOUNT;
-    if (referralAccount) {
-      swapBody.feeAccount = referralAccount;
-    }
-
+    // Get swap transaction
     const swapResponse = await fetch(JUPITER_SWAP_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(swapBody),
+      body: JSON.stringify({
+        quoteResponse: quote,
+        userPublicKey: userWallet,
+        wrapAndUnwrapSol: true,
+        dynamicComputeUnitLimit: true,
+        prioritizationFeeLamports: 'auto',
+      }),
     });
+
+    if (!swapResponse.ok) {
+      console.error('Jupiter swap error:', await swapResponse.text());
+      return NextResponse.json(
+        { error: 'Failed to create transaction' },
+        { status: 502 }
+      );
+    }
 
     const swapData = await swapResponse.json();
 
-    if (!swapResponse.ok || swapData.error) {
-      throw new Error(swapData.error || 'Failed to create swap transaction');
+    if (swapData.error) {
+      return NextResponse.json({ error: swapData.error }, { status: 400 });
     }
-
-    const referralEarning = (parseInt(quote.outAmount) * PLATFORM_FEE_BPS) / 10000 / 1e9;
 
     return NextResponse.json({
       success: true,
       transaction: swapData.swapTransaction,
       expectedOutput: quote.outAmount,
       priceImpact: quote.priceImpactPct,
-      referralEarning,
-      route: quote.routePlan?.map((r: any) => r.swapInfo?.label).filter(Boolean).join(' → ') || 'Direct',
     });
   } catch (error: any) {
-    console.error('Sell trade failed:', error);
+    console.error('Sell failed:', error.message);
     return NextResponse.json(
-      { error: error.message || 'Failed to create sell transaction' },
+      { error: 'Failed to create sell transaction' },
       { status: 500 }
     );
   }

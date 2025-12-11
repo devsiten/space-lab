@@ -8,15 +8,16 @@ import { clusterApiUrl } from '@solana/web3.js';
 import { useMemo } from 'react';
 import { Toaster } from 'react-hot-toast';
 
-require('@solana/wallet-adapter-react-ui/styles.css');
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => 
-    process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl(network),
-    [network]
-  );
-  
+
+  const endpoint = useMemo(() => {
+    // Use custom RPC if provided, otherwise fall back to public (not recommended for production)
+    return process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl(network);
+  }, [network]);
+
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -26,11 +27,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider
+      endpoint={endpoint}
+      config={{
+        commitment: 'confirmed',
+        confirmTransactionInitialTimeout: 60000,
+      }}
+    >
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           {children}
-          <Toaster 
+          <Toaster
             position="bottom-right"
             toastOptions={{
               duration: 4000,

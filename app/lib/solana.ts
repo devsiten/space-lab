@@ -1,8 +1,6 @@
 import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import bs58 from 'bs58';
 
-// Singleton connection instance
 let connectionInstance: Connection | null = null;
 
 /**
@@ -11,7 +9,10 @@ let connectionInstance: Connection | null = null;
 export function getConnection(): Connection {
   if (!connectionInstance) {
     const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://api.mainnet-beta.solana.com';
-    connectionInstance = new Connection(rpcUrl, 'confirmed');
+    connectionInstance = new Connection(rpcUrl, {
+      commitment: 'confirmed',
+      confirmTransactionInitialTimeout: 60000,
+    });
   }
   return connectionInstance;
 }
@@ -24,8 +25,7 @@ export function getPlatformWallet(): Keypair {
   if (!key) {
     throw new Error('PLATFORM_WALLET_KEY not configured');
   }
-  
-  // Try base64 first, then bs58
+
   try {
     return Keypair.fromSecretKey(Buffer.from(key, 'base64'));
   } catch {
@@ -38,7 +38,7 @@ export function getPlatformWallet(): Keypair {
  */
 export function findMetadataPDA(mint: PublicKey): PublicKey {
   const METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
-  
+
   const [pda] = PublicKey.findProgramAddressSync(
     [
       Buffer.from('metadata'),
@@ -47,7 +47,7 @@ export function findMetadataPDA(mint: PublicKey): PublicKey {
     ],
     METADATA_PROGRAM_ID
   );
-  
+
   return pda;
 }
 
@@ -59,7 +59,7 @@ export function findBondingCurvePDA(mint: PublicKey, programId: PublicKey): Publ
     [Buffer.from('curve'), mint.toBuffer()],
     programId
   );
-  
+
   return pda;
 }
 
@@ -67,17 +67,17 @@ export function findBondingCurvePDA(mint: PublicKey, programId: PublicKey): Publ
  * Get token balance for a wallet
  */
 export async function getTokenBalance(
-  connection: Connection,
   wallet: PublicKey,
   mint: PublicKey
 ): Promise<number> {
   try {
+    const connection = getConnection();
     const tokenAccounts = await connection.getParsedTokenAccountsByOwner(wallet, {
       mint,
     });
-    
+
     if (tokenAccounts.value.length === 0) return 0;
-    
+
     return tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount || 0;
   } catch {
     return 0;
@@ -87,11 +87,9 @@ export async function getTokenBalance(
 /**
  * Get SOL balance for a wallet
  */
-export async function getSOLBalance(
-  connection: Connection,
-  wallet: PublicKey
-): Promise<number> {
+export async function getSOLBalance(wallet: PublicKey): Promise<number> {
   try {
+    const connection = getConnection();
     const balance = await connection.getBalance(wallet);
     return balance / 1e9;
   } catch {
@@ -100,35 +98,50 @@ export async function getSOLBalance(
 }
 
 /**
- * Send and confirm transaction
+ * Send and confirm transaction with retries
  */
 export async function sendAndConfirmTransaction(
-  connection: Connection,
   transaction: Transaction | VersionedTransaction,
   signers?: Keypair[]
 ): Promise<string> {
+  const connection = getConnection();
   let signature: string;
-  
+
   if (transaction instanceof VersionedTransaction) {
-    signature = await connection.sendTransaction(transaction);
+    signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+    });
   } else {
     if (signers && signers.length > 0) {
       transaction.sign(...signers);
     }
-    signature = await connection.sendRawTransaction(transaction.serialize());
+    signature = await connection.sendRawTransaction(transaction.serialize(), {
+      skipPreflight: false,
+      maxRetries: 3,
+    });
   }
-  
-  await connection.confirmTransaction(signature, 'confirmed');
-  
+
+  // Wait for confirmation with timeout
+  const latestBlockhash = await connection.getLatestBlockhash();
+  await connection.confirmTransaction({
+    signature,
+    blockhash: latestBlockhash.blockhash,
+    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+  }, 'confirmed');
+
   return signature;
 }
 
 /**
  * Get recent blockhash
  */
-export async function getRecentBlockhash(connection: Connection): Promise<string> {
-  const { blockhash } = await connection.getLatestBlockhash();
-  return blockhash;
+export async function getRecentBlockhash(): Promise<{
+  blockhash: string;
+  lastValidBlockHeight: number;
+}> {
+  const connection = getConnection();
+  return connection.getLatestBlockhash();
 }
 
 /**

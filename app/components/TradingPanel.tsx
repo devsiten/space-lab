@@ -14,6 +14,7 @@ interface TradingPanelProps {
     symbol: string;
     name: string;
     price: number;
+    decimals?: number;
   };
 }
 
@@ -26,7 +27,8 @@ export function TradingPanel({ token }: TradingPanelProps) {
   const [quote, setQuote] = useState<any>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
 
-  // Debounced quote fetching
+  const tokenDecimals = token.decimals ?? 6; // Most SPL tokens use 6 decimals
+
   useEffect(() => {
     if (!amount || parseFloat(amount) <= 0) {
       setQuote(null);
@@ -42,29 +44,39 @@ export function TradingPanel({ token }: TradingPanelProps) {
 
   const getQuote = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
-    
+
     setQuoteLoading(true);
     try {
+      // Calculate amount based on whether buying or selling
+      const rawAmount = activeTab === 'buy'
+        ? Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL) // SOL has 9 decimals
+        : Math.floor(parseFloat(amount) * Math.pow(10, tokenDecimals)); // Token decimals
+
       const res = await fetch('/api/trade/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          inputMint: activeTab === 'buy' 
-            ? 'So11111111111111111111111111111111111111112' 
+          inputMint: activeTab === 'buy'
+            ? 'So11111111111111111111111111111111111111112'
             : token.mint,
-          outputMint: activeTab === 'buy' 
-            ? token.mint 
+          outputMint: activeTab === 'buy'
+            ? token.mint
             : 'So11111111111111111111111111111111111111112',
-          amount: Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL)
-        })
+          amount: rawAmount,
+        }),
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setQuote(data);
+      } else {
+        const error = await res.json();
+        console.error('Quote error:', error);
+        setQuote(null);
       }
     } catch (error) {
       console.error('Failed to get quote:', error);
+      setQuote(null);
     } finally {
       setQuoteLoading(false);
     }
@@ -85,33 +97,40 @@ export function TradingPanel({ token }: TradingPanelProps) {
     const toastId = toast.loading(`${activeTab === 'buy' ? 'Buying' : 'Selling'} ${token.symbol}...`);
 
     try {
+      // Calculate amount based on whether buying or selling
+      const rawAmount = activeTab === 'buy'
+        ? Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL)
+        : Math.floor(parseFloat(amount) * Math.pow(10, tokenDecimals));
+
       const endpoint = activeTab === 'buy' ? '/api/trade/buy' : '/api/trade/sell';
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tokenAddress: token.mint,
-          amount: Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL),
-          userWallet: publicKey.toString()
-        })
+          amount: rawAmount,
+          userWallet: publicKey.toString(),
+        }),
       });
 
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || 'Failed to create transaction');
       }
-      
-      const { transaction, referralEarning } = await res.json();
-      
-      // Deserialize and sign transaction
+
+      const { transaction } = await res.json();
+
       const swapTransactionBuf = Buffer.from(transaction, 'base64');
       const tx = VersionedTransaction.deserialize(swapTransactionBuf);
-      
+
       const signedTx = await signTransaction(tx);
-      const signature = await connection.sendRawTransaction(signedTx.serialize());
-      
+      const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        maxRetries: 3,
+      });
+
       await connection.confirmTransaction(signature, 'confirmed');
-      
+
       toast.dismiss(toastId);
       toast.success(
         <div>
@@ -128,10 +147,9 @@ export function TradingPanel({ token }: TradingPanelProps) {
           </a>
         </div>
       );
-      
+
       setAmount('');
       setQuote(null);
-      
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(error.message || 'Transaction failed');
@@ -140,9 +158,20 @@ export function TradingPanel({ token }: TradingPanelProps) {
     }
   };
 
+  // Format output amount based on direction
+  const formatOutputAmount = () => {
+    if (!quote) return '0';
+    if (activeTab === 'buy') {
+      // Receiving tokens
+      return formatNumber(parseInt(quote.outAmount) / Math.pow(10, tokenDecimals));
+    } else {
+      // Receiving SOL
+      return formatNumber(parseInt(quote.outAmount) / LAMPORTS_PER_SOL);
+    }
+  };
+
   return (
     <div className="bg-[#131314] border border-[#1F1F22] rounded-2xl p-6">
-      {/* Buy/Sell Tabs */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => {
@@ -174,7 +203,6 @@ export function TradingPanel({ token }: TradingPanelProps) {
         </button>
       </div>
 
-      {/* Amount Input */}
       <div className="mb-4">
         <label className="block text-gray-400 text-sm mb-2">
           You pay ({activeTab === 'buy' ? 'SOL' : token.symbol})
@@ -203,7 +231,6 @@ export function TradingPanel({ token }: TradingPanelProps) {
         </div>
       </div>
 
-      {/* Quote Display */}
       {(quote || quoteLoading) && (
         <div className="mb-4 p-4 bg-[#0A0A0B] rounded-xl space-y-2">
           {quoteLoading ? (
@@ -219,13 +246,13 @@ export function TradingPanel({ token }: TradingPanelProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">You receive</span>
                 <span className="text-white font-semibold">
-                  {formatNumber(quote.outAmount / LAMPORTS_PER_SOL)} {activeTab === 'buy' ? token.symbol : 'SOL'}
+                  {formatOutputAmount()} {activeTab === 'buy' ? token.symbol : 'SOL'}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Price impact</span>
-                <span className={quote.priceImpactPct > 3 ? 'text-red-500' : 'text-gray-400'}>
-                  {(quote.priceImpactPct || 0).toFixed(2)}%
+                <span className={parseFloat(quote.priceImpactPct) > 3 ? 'text-red-500' : 'text-gray-400'}>
+                  {(parseFloat(quote.priceImpactPct) || 0).toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -243,7 +270,6 @@ export function TradingPanel({ token }: TradingPanelProps) {
         </div>
       )}
 
-      {/* Trade Button */}
       <button
         onClick={executeTrade}
         disabled={!amount || loading || !connected || quoteLoading}
@@ -268,7 +294,6 @@ export function TradingPanel({ token }: TradingPanelProps) {
         )}
       </button>
 
-      {/* Info Text */}
       <p className="text-xs text-gray-500 text-center mt-3">
         Powered by Jupiter • Best price guaranteed • 0.5% platform fee
       </p>

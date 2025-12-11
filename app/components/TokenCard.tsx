@@ -166,9 +166,16 @@ export function TokenCard({ token, rank }: TokenCardProps) {
         {/* Stats Row */}
         <div className="flex items-center justify-between text-xs mb-4 relative z-10 px-1">
           <div className="flex items-center gap-4">
-            <span className="text-gray-500 flex items-center gap-1">
-              <span className="text-white font-bold">{token.holders}</span> holders
-            </span>
+            {token.volume24h > 0 && (
+              <span className="text-gray-500 flex items-center gap-1">
+                Vol: <span className="text-white font-bold">${formatNumber(token.volume24h)}</span>
+              </span>
+            )}
+            {token.liquidity > 0 && (
+              <span className="text-gray-500 flex items-center gap-1">
+                Liq: <span className="text-white font-bold">${formatNumber(token.liquidity)}</span>
+              </span>
+            )}
           </div>
           {token.platform === 'Space Lab' && (
             <span className="text-violet-400 text-xs font-medium flex items-center gap-1 bg-violet-500/10 px-2 py-0.5 rounded-full border border-violet-500/20">

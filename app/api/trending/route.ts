@@ -13,7 +13,22 @@ async function getTokenDetails(addresses: string[]) {
     });
     
     if (!res.ok) return [];
-    return res.json();
+    const data = await res.json();
+    
+    // DexScreener tokens API returns object with token addresses as keys
+    // Each key contains an array of pairs
+    const allPairs: any[] = [];
+    if (data && typeof data === 'object') {
+      Object.values(data).forEach((tokenData: any) => {
+        if (Array.isArray(tokenData?.pairs)) {
+          allPairs.push(...tokenData.pairs);
+        } else if (Array.isArray(tokenData)) {
+          allPairs.push(...tokenData);
+        }
+      });
+    }
+    
+    return allPairs;
   } catch {
     return [];
   }
@@ -109,9 +124,14 @@ export async function GET(request: Request) {
     const addresses = solanaTokens.map((t: any) => t.tokenAddress).slice(0, 30);
     const pairs = await getTokenDetails(addresses);
 
-    const tokens = (Array.isArray(pairs) ? pairs : [])
+    // Filter to only Solana pairs and ensure we have valid data
+    const solanaPairs = pairs.filter((p: any) => 
+      p && p.chainId === 'solana' && p.baseToken && p.baseToken.address
+    );
+
+    const tokens = solanaPairs
       .map(mapPairToToken)
-      .filter((t: any) => t.mint);
+      .filter((t: any) => t.mint && t.name !== 'Unknown');
 
     const sorted = sortByCategory(tokens, category);
 

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,7 +28,8 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0A0A0B] text-white`}>
         <Providers>
           <Header />
-          <main className="min-h-screen">
+          <Sidebar />
+          <main className="min-h-screen lg:ml-64">
             {children}
           </main>
         </Providers>
@@ -35,3 +37,4 @@ export default function RootLayout({
     </html>
   );
 }
+

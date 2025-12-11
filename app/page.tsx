@@ -236,8 +236,8 @@ export default function HomePage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${activeTab === tab.id
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-[#131314] text-gray-400 hover:text-white border border-[#1F1F22] hover:border-purple-600'
+                ? 'bg-purple-600 text-white'
+                : 'bg-[#131314] text-gray-400 hover:text-white border border-[#1F1F22] hover:border-purple-600'
                 }`}
             >
               {tab.label}
@@ -266,52 +266,6 @@ export default function HomePage() {
             </button>
           </div>
         )}
-      </div>
-
-      {/* Footer Section */}
-      <div className="border-t border-[#1F1F22] mt-20">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="text-white font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2">
-                <li><Link href="/create" className="text-gray-400 hover:text-purple-400 transition-colors">Launch Token</Link></li>
-                <li><Link href="/tokens" className="text-gray-400 hover:text-purple-400 transition-colors">All Tokens</Link></li>
-                <li><Link href="/graduating" className="text-gray-400 hover:text-purple-400 transition-colors">Graduating Soon</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Learn</h4>
-              <ul className="space-y-2">
-                <li><Link href="/how-it-works" className="text-gray-400 hover:text-purple-400 transition-colors">How it Works</Link></li>
-                <li><Link href="/faq" className="text-gray-400 hover:text-purple-400 transition-colors">FAQ</Link></li>
-                <li><Link href="/docs" className="text-gray-400 hover:text-purple-400 transition-colors">Documentation</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Community</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Twitter</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Telegram</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Discord</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Stats</h4>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-400">Total Volume: <span className="text-white">${formatNumber(stats.totalVolume)}</span></p>
-                <p className="text-gray-400">Tokens Created: <span className="text-white">{formatNumber(stats.totalTokens)}</span></p>
-                <p className="text-gray-400">Platform Earnings: <span className="text-purple-400">${formatNumber(stats.totalEarnings)}</span></p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-[#1F1F22] text-center">
-            <p className="text-gray-500 text-sm">
-              © 2024 Space Lab. Launch tokens with YOUR authority • Trade on Jupiter • Earn 0.5% referral
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

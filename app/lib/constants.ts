@@ -54,10 +54,11 @@ export const TRENDING_CATEGORIES = [
 // Quick Buy Amounts (in SOL)
 export const QUICK_BUY_AMOUNTS = [0.1, 0.5, 1];
 
-// Program IDs (Example - Update with actual addresses)
+// Program IDs
 export const PROGRAM_IDS = {
-  bondingCurve: '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwFc1',
-  metadata: 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
+  pumpFun: '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P', // Pump.fun main program
+  pumpFunAMM: 'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA', // Pump.fun AMM
+  metadata: 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s', // Metaplex metadata
 };
 
 // Color Theme

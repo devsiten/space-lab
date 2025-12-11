@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js';
 
 // Platform Configuration
 export const PLATFORM_NAME = 'Space Lab';
-export const PLATFORM_FEE_BPS = 50; // 0.5% referral fee
+export const PLATFORM_FEE_BPS = 100; // 1% trading fee (same as Pump.fun)
 
 // Solana Constants
 export const SOL_MINT = 'So11111111111111111111111111111111111111112';

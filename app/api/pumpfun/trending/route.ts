@@ -1,44 +1,30 @@
 import { NextResponse } from 'next/server';
 
-// Public Pump.fun frontend feed (community-documented)
-// This may change; we wrap in try/catch and return a safe fallback.
-const PUMP_FUN_TRENDING_API = 'https://frontend-api.pump.fun/trending';
-const PUMP_FUN_NEW_API = 'https://frontend-api.pump.fun/recent';
+// DexScreener API for Solana trending tokens
+const DEXSCREENER_SEARCH_API = 'https://api.dexscreener.com/latest/dex/search';
 
-// Normalize Pump.fun token data into our Token shape
-function mapPumpFunToken(token: any) {
-  const price = token.price_usd ?? token.price ?? 0;
-  const price24hAgo =
-    token.price_usd_24h_ago ??
-    token.price24hAgo ??
-    (price && token.price_change_24h
-      ? price / (1 + token.price_change_24h / 100)
-      : 0);
+// Normalize DexScreener pair data into our Token shape
+function mapDexScreenerPair(pair: any) {
+  const baseToken = pair.baseToken || {};
+  const priceUsd = parseFloat(pair.priceUsd) || 0;
+  const priceChange24h = pair.priceChange?.h24 || 0;
 
   return {
-    mint: token.mint ?? token.address ?? token.mintAddress ?? '',
-    name: token.name ?? token.token ?? 'Unknown',
-    symbol: token.symbol ?? token.ticker ?? '???',
-    image: token.image_uri ?? token.image ?? null,
-    price,
-    price24hAgo,
-    priceChange24h: token.price_change_24h ?? token.priceChange24h ?? 0,
-    marketCap:
-      token.usd_market_cap ??
-      token.market_cap ??
-      (token.liquidity_usd && token.fd_mc ? token.fd_mc : 0) ??
-      0,
-    volume24h:
-      token.usd_volume_24h ??
-      token.volume_24h ??
-      token.volume24h ??
-      token.usd_volume ?? 0,
-    liquidity: token.usd_liquidity ?? token.liquidity_usd ?? token.liquidity ?? 0,
-    holders: token.holder_count ?? token.holders ?? 0,
-    txns24h: token.transactions_24h ?? token.txns24h ?? 0,
-    createdAt: token.created_timestamp ?? token.created_at ?? token.createdAt ?? null,
-    creatorWallet: token.creator ?? token.owner ?? token.creator_wallet ?? '',
-    platform: 'Pump.fun',
+    mint: baseToken.address || pair.pairAddress || '',
+    name: baseToken.name || 'Unknown',
+    symbol: baseToken.symbol || '???',
+    image: pair.info?.imageUrl || null,
+    price: priceUsd,
+    price24hAgo: priceChange24h !== 0 ? priceUsd / (1 + priceChange24h / 100) : priceUsd,
+    priceChange24h,
+    marketCap: pair.marketCap || pair.fdv || 0,
+    volume24h: pair.volume?.h24 || 0,
+    liquidity: pair.liquidity?.usd || 0,
+    holders: 0, // DexScreener doesn't provide holder count
+    txns24h: (pair.txns?.h24?.buys || 0) + (pair.txns?.h24?.sells || 0),
+    createdAt: pair.pairCreatedAt ? new Date(pair.pairCreatedAt).toISOString() : null,
+    creatorWallet: '',
+    platform: pair.dexId || 'Unknown',
     graduated: false,
   };
 }
@@ -49,30 +35,59 @@ export async function GET(request: Request) {
   const limit = parseInt(searchParams.get('limit') || '30', 10);
 
   try {
-    let apiUrl = PUMP_FUN_TRENDING_API;
-    if (category === 'new') apiUrl = PUMP_FUN_NEW_API;
+    // DexScreener search for trending Solana meme tokens
+    const searchTerms: Record<string, string> = {
+      hot: 'solana meme',
+      new: 'solana new',
+      rising: 'solana pump',
+      graduated: 'solana raydium',
+    };
 
-    const url = new URL(apiUrl);
-    url.searchParams.set('limit', String(limit));
+    const searchQuery = searchTerms[category] || searchTerms.hot;
+    const url = `${DEXSCREENER_SEARCH_API}?q=${encodeURIComponent(searchQuery)}`;
 
-    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
     if (!res.ok) {
-      throw new Error(`Pump.fun API error: ${res.status}`);
+      throw new Error(`DexScreener API error: ${res.status}`);
     }
 
     const data = await res.json();
-    const tokensRaw = Array.isArray(data) ? data : data.tokens || data.items || [];
-    const tokens = tokensRaw.map(mapPumpFunToken).filter((t: { mint: string }) => t.mint);
+    const pairs = data.pairs || [];
 
-    return NextResponse.json(tokens.slice(0, limit));
+    // Filter to only Solana tokens and exclude stablecoins/wrapped tokens
+    const solanaTokens = pairs
+      .filter((pair: any) =>
+        pair.chainId === 'solana' &&
+        pair.baseToken?.symbol !== 'SOL' &&
+        pair.baseToken?.symbol !== 'USDC' &&
+        pair.baseToken?.symbol !== 'USDT' &&
+        !pair.baseToken?.name?.toLowerCase().includes('wrapped')
+      )
+      .map(mapDexScreenerPair)
+      .filter((t: { mint: string }) => t.mint);
+
+    // Sort by volume for 'hot', by creation date for 'new'
+    if (category === 'new') {
+      solanaTokens.sort((a: any, b: any) =>
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+    } else {
+      solanaTokens.sort((a: any, b: any) => b.volume24h - a.volume24h);
+    }
+
+    return NextResponse.json(solanaTokens.slice(0, limit));
   } catch (err) {
-    console.error('Pump.fun fetch failed:', err);
+    console.error('DexScreener fetch failed:', err);
 
-    // Surface error to caller; no mock fallback
     return NextResponse.json(
-      { error: 'Failed to fetch Pump.fun data' },
+      { error: 'Failed to fetch trending tokens' },
       { status: 502 }
     );
   }
 }
-

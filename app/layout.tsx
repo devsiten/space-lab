@@ -28,10 +28,12 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0A0A0B] text-white`}>
         <Providers>
           <Header />
-          <Sidebar />
-          <main className="min-h-screen lg:ml-64">
-            {children}
-          </main>
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1 min-h-screen">
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>

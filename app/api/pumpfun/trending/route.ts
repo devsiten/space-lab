@@ -62,7 +62,7 @@ export async function GET(request: Request) {
 
     const data = await res.json();
     const tokensRaw = Array.isArray(data) ? data : data.tokens || data.items || [];
-    const tokens = tokensRaw.map(mapPumpFunToken).filter((t) => t.mint);
+    const tokens = tokensRaw.map(mapPumpFunToken).filter((t: { mint: string }) => t.mint);
 
     return NextResponse.json(tokens.slice(0, limit));
   } catch (err) {

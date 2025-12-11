@@ -43,3 +43,5 @@ Thumbs.db
 # Solana
 platform-wallet.json
 *.keypair
+
+.vercel

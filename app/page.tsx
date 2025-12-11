@@ -47,15 +47,16 @@ export default function HomePage() {
   const fetchTokens = async (category: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/tokens/trending?category=${category}&limit=30`);
+      // Fetch directly from Pump.fun-backed endpoint
+      const res = await fetch(`/api/pumpfun/trending?category=${category}&limit=30`);
       if (res.ok) {
         const data = await res.json();
         setTokens(data);
       }
     } catch (error) {
       console.error('Failed to fetch tokens:', error);
-      // Use mock data for demo
-      setTokens(generateMockTokens());
+      // No mock fallback; show empty if upstream fails
+      setTokens([]);
     } finally {
       setLoading(false);
     }
@@ -231,24 +232,3 @@ export default function HomePage() {
   );
 }
 
-// Generate mock tokens for demo
-function generateMockTokens() {
-  const names = ['DogeMoon', 'CatRocket', 'PepeCash', 'ShibaKing', 'FlokiGold', 'BonkMaster', 'WifHat', 'PopcatSOL', 'MemeKing'];
-  return names.map((name, i) => ({
-    mint: `mock${i}${Math.random().toString(36).substring(7)}`,
-    name,
-    symbol: name.substring(0, 4).toUpperCase(),
-    image: null,
-    price: Math.random() * 0.0001,
-    price24hAgo: Math.random() * 0.0001,
-    marketCap: Math.random() * 50000 + 1000,
-    volume24h: Math.random() * 100000,
-    holders: Math.floor(Math.random() * 500) + 10,
-    txns24h: Math.floor(Math.random() * 1000),
-    createdAt: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-    creatorWallet: 'Demo' + Math.random().toString(36).substring(2, 10),
-    platform: i % 3 === 0 ? 'Space Lab' : 'PumpFun',
-    graduated: false,
-    priceChange24h: (Math.random() - 0.5) * 100,
-  }));
-}

@@ -7,10 +7,28 @@ import { TokenGrid } from './components/TokenGrid';
 import { formatNumber } from './lib/utils';
 import { TRENDING_CATEGORIES } from './lib/constants';
 
+interface Token {
+  mint: string;
+  name: string;
+  symbol: string;
+  image: string | null;
+  price: number;
+  price24hAgo: number;
+  marketCap: number;
+  volume24h: number;
+  holders: number;
+  txns24h: number;
+  createdAt: string;
+  creatorWallet: string;
+  platform: string;
+  graduated: boolean;
+  priceChange24h: number;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('hot');
-  const [tokens, setTokens] = useState([]);
+  const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({
@@ -78,7 +96,7 @@ export default function HomePage() {
           <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-white to-purple-400 bg-clip-text text-transparent">
@@ -87,7 +105,7 @@ export default function HomePage() {
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
               No presale, no team tokens, no bullsh*t. Launch a coin that's tradeable instantly.
             </p>
-            
+
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
               <div className="relative">
@@ -172,8 +190,8 @@ export default function HomePage() {
               <div className="flex items-center gap-4">
                 <div className="relative">
                   {tokens[0].image ? (
-                    <img 
-                      src={tokens[0].image} 
+                    <img
+                      src={tokens[0].image}
                       alt={tokens[0].name}
                       className="w-16 h-16 rounded-xl object-cover"
                     />
@@ -217,11 +235,10 @@ export default function HomePage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
-                activeTab === tab.id
+              className={`px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${activeTab === tab.id
                   ? 'bg-purple-600 text-white'
                   : 'bg-[#131314] text-gray-400 hover:text-white border border-[#1F1F22] hover:border-purple-600'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -242,7 +259,7 @@ export default function HomePage() {
         {tokens.length >= 30 && (
           <div className="text-center mt-12">
             <button
-              onClick={() => {/* Load more logic */}}
+              onClick={() => {/* Load more logic */ }}
               className="bg-[#131314] border border-[#1F1F22] hover:border-purple-600 text-white px-8 py-3 rounded-xl font-semibold transition-all"
             >
               Load More
@@ -288,7 +305,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-12 pt-8 border-t border-[#1F1F22] text-center">
             <p className="text-gray-500 text-sm">
               © 2024 Space Lab. Launch tokens with YOUR authority • Trade on Jupiter • Earn 0.5% referral

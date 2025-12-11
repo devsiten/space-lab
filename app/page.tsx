@@ -88,175 +88,141 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B]">
-      {/* Hero Section with Gradient */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-transparent" />
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-        </div>
+    <div className="min-h-screen">
+      {/* Hero Section with Deep Space Gfx */}
+      <div className="relative overflow-hidden pt-12 pb-24">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] animate-pulse delay-1000" />
 
-        <div className="relative max-w-7xl mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-white to-purple-400 bg-clip-text text-transparent">
-              Launch fair, safe memecoins
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <span className="flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-sm font-medium text-gray-300">Live on Solana Mainnet</span>
+            </div>
+
+            <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+              <span className="text-white drop-shadow-lg">Launch fair, safe</span>
+              <br />
+              <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg p-2">memecoins instantly</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              No presale, no team tokens, no bullsh*t. Launch a coin that's tradeable instantly.
+
+            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+              No presale, no team tokens, no rug pulls. <br />
+              Launch on Space Lab, graduate to <span className="text-green-400 font-bold">Raydium</span>.
             </p>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by token name, symbol, or address..."
-                  className="w-full bg-[#131314]/80 backdrop-blur border border-[#1F1F22] rounded-2xl px-6 py-4 text-white text-lg focus:border-purple-600 focus:outline-none transition-all pr-32 pl-12"
-                />
-                <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all"
-                >
-                  Search
-                </button>
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 relative z-10">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-blue-600/20 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search tokens by name, symbol, or address..."
+                    className="w-full bg-[#131314]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-6 py-5 text-white text-lg focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 focus:outline-none transition-all pr-32 pl-14 shadow-xl"
+                  />
+                  <svg
+                    className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-500 group-hover:text-violet-400 transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-violet-600/25 transition-all hover:scale-105"
+                  >
+                    Search
+                  </button>
+                </div>
               </div>
             </form>
 
             {/* CTA Buttons */}
-            <div className="flex items-center justify-center gap-4 flex-wrap">
+            <div className="flex items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400">
               <Link
                 href="/create"
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 flex items-center gap-2"
+                className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-black rounded-2xl font-bold text-lg transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
               >
-                <span>🚀</span> Launch Token
+                <span>🚀 Launch Token</span>
+                <div className="absolute inset-0 rounded-2xl ring-2 ring-white/50 group-hover:ring-white/80 transition-all opacity-0 group-hover:opacity-100" />
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Bar */}
-      <div className="border-y border-[#1F1F22] bg-[#131314]/50 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <p className="text-gray-500 text-sm mb-1">24h Volume</p>
-              <p className="text-2xl font-bold text-white">${formatNumber(stats.totalVolume)}</p>
-              <p className={`text-sm ${stats.volumeChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {stats.volumeChange >= 0 ? '+' : ''}{stats.volumeChange.toFixed(2)}%
-              </p>
+      {/* Glass Stats Bar */}
+      <div className="border-y border-white/5 bg-[#0A0A0B]/50 backdrop-blur-md relative z-20">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/5">
+            <div className="px-4 text-center md:text-left">
+              <p className="text-gray-500 text-xs uppercase tracking-wider mb-2 font-medium">Total Volume</p>
+              <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">${formatNumber(stats.totalVolume)}</p>
             </div>
-            <div>
-              <p className="text-gray-500 text-sm mb-1">Tokens Launched</p>
-              <p className="text-2xl font-bold text-white">{formatNumber(stats.totalTokens)}</p>
-              <p className="text-sm text-gray-400">All time</p>
+            <div className="px-4 text-center md:text-left">
+              <p className="text-gray-500 text-xs uppercase tracking-wider mb-2 font-medium">Tokens Launched</p>
+              <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">{formatNumber(stats.totalTokens)}</p>
             </div>
-            <div>
-              <p className="text-gray-500 text-sm mb-1">Active Traders</p>
-              <p className="text-2xl font-bold text-white">{formatNumber(stats.totalTraders)}</p>
-              <p className="text-sm text-gray-400">Last 24h</p>
+            <div className="px-4 text-center md:text-left">
+              <p className="text-gray-500 text-xs uppercase tracking-wider mb-2 font-medium">Active Traders</p>
+              <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">{formatNumber(stats.totalTraders)}</p>
             </div>
-            <div>
-              <p className="text-gray-500 text-sm mb-1">Platform Earnings</p>
-              <p className="text-2xl font-bold text-purple-400">${formatNumber(stats.totalEarnings)}</p>
-              <p className="text-sm text-gray-400">0.5% on all trades</p>
+            <div className="px-4 text-center md:text-left">
+              <p className="text-gray-500 text-xs uppercase tracking-wider mb-2 font-medium">Platform Earnings</p>
+              <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">${formatNumber(stats.totalEarnings)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Featured Token Banner */}
-      {tokens.length > 0 && activeTab === 'hot' && (
-        <div className="max-w-7xl mx-auto px-4 mt-8">
-          <div className="bg-gradient-to-r from-purple-900/30 to-purple-600/20 border border-purple-600/30 rounded-2xl p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  {tokens[0].image ? (
-                    <img
-                      src={tokens[0].image}
-                      alt={tokens[0].name}
-                      className="w-16 h-16 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-purple-400 flex items-center justify-center">
-                      <span className="text-white font-bold text-2xl">{tokens[0].symbol?.charAt(0)}</span>
-                    </div>
-                  )}
-                  <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
-                    #1
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-purple-400 mb-1">🔥 Trending #1</p>
-                  <h3 className="text-2xl font-bold text-white">{tokens[0].name}</h3>
-                  <p className="text-gray-400">${tokens[0].symbol} • MCap: ${formatNumber(tokens[0].marketCap)}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-white">${tokens[0].price?.toFixed(9)}</p>
-                <p className={`text-lg ${tokens[0].priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {tokens[0].priceChange24h >= 0 ? '+' : ''}{tokens[0].priceChange24h?.toFixed(2)}%
-                </p>
-                <Link
-                  href={`/token/${tokens[0].mint}`}
-                  className="inline-block mt-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
-                >
-                  Trade Now
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2">
-          {TRENDING_CATEGORIES.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${activeTab === tab.id
-                ? 'bg-purple-600 text-white'
-                : 'bg-[#131314] text-gray-400 hover:text-white border border-[#1F1F22] hover:border-purple-600'
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <span className="text-2xl">🔥</span> Trending Tokens
+          </h2>
 
-        {/* Active Tab Description */}
-        <div className="mb-6">
-          <p className="text-gray-400">
-            {TRENDING_CATEGORIES.find(t => t.id === activeTab)?.description}
-          </p>
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl backdrop-blur-md border border-white/5 overflow-x-auto max-w-full">
+            {TRENDING_CATEGORIES.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all whitespace-nowrap ${activeTab === tab.id
+                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Token Grid */}
-        <TokenGrid tokens={tokens} loading={loading} />
+        <div className="min-h-[600px]">
+          <TokenGrid tokens={tokens} loading={loading} />
+        </div>
 
         {/* Load More Button */}
         {tokens.length >= 30 && (
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <button
               onClick={() => {/* Load more logic */ }}
-              className="bg-[#131314] border border-[#1F1F22] hover:border-purple-600 text-white px-8 py-3 rounded-xl font-semibold transition-all"
+              className="glass-panel px-8 py-4 rounded-xl font-bold text-white hover:bg-white/10 hover:scale-105 transition-all shadow-lg border border-white/10"
             >
-              Load More
+              Load More Tokens
             </button>
           </div>
         )}

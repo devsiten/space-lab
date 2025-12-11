@@ -25,10 +25,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-[#0A0A0B] text-white`}>
+      <body className={`${inter.className} bg-[#050507] text-white selection:bg-violet-500 selection:text-white`}>
         <Providers>
           <Header />
-          <div className="flex">
+          <div className="flex relative">
             <Sidebar />
             <main className="flex-1 min-h-screen">
               {children}

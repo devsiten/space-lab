@@ -42,16 +42,59 @@ export default function TokenPage() {
   const fetchTokenData = async () => {
     setLoading(true);
     try {
+      // First try our API
       const res = await fetch(`/api/tokens/${address}`);
       if (res.ok) {
         const data = await res.json();
-        setToken(data);
-      } else {
-        // Use mock data for demo
-        setToken(generateMockToken(address));
+        if (data && data.mint) {
+          setToken(data);
+          return;
+        }
       }
+
+      // Fallback to DexScreener for real token data
+      const dexRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${address}`);
+      if (dexRes.ok) {
+        const dexData = await dexRes.json();
+        const pairs = dexData.pairs || [];
+        const solanaPair = pairs.find((p: any) => p.chainId === 'solana');
+
+        if (solanaPair) {
+          const baseToken = solanaPair.baseToken || {};
+          const priceUsd = parseFloat(solanaPair.priceUsd) || 0;
+          const priceChange24h = solanaPair.priceChange?.h24 || 0;
+
+          setToken({
+            mint: baseToken.address || address,
+            name: baseToken.name || 'Unknown Token',
+            symbol: baseToken.symbol || '???',
+            description: null,
+            image: solanaPair.info?.imageUrl || null,
+            price: priceUsd,
+            price24hAgo: priceChange24h !== 0 ? priceUsd / (1 + priceChange24h / 100) : priceUsd,
+            marketCap: solanaPair.marketCap || solanaPair.fdv || 0,
+            liquidity: solanaPair.liquidity?.usd || 0,
+            volume24h: solanaPair.volume?.h24 || 0,
+            holders: 0,
+            txns24h: (solanaPair.txns?.h24?.buys || 0) + (solanaPair.txns?.h24?.sells || 0),
+            createdAt: solanaPair.pairCreatedAt ? new Date(solanaPair.pairCreatedAt).toISOString() : null,
+            creatorWallet: '',
+            deployedBy: '',
+            platform: solanaPair.dexId || 'Unknown',
+            graduated: false,
+            twitter: solanaPair.info?.socials?.find((s: any) => s.type === 'twitter')?.url || null,
+            telegram: solanaPair.info?.socials?.find((s: any) => s.type === 'telegram')?.url || null,
+            website: solanaPair.info?.websites?.[0]?.url || null,
+          });
+          return;
+        }
+      }
+
+      // No data found
+      setToken(null);
     } catch (error) {
-      setToken(generateMockToken(address));
+      console.error('Failed to fetch token:', error);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -64,10 +107,11 @@ export default function TokenPage() {
         const data = await res.json();
         setRecentTrades(data);
       } else {
-        setRecentTrades(generateMockTrades());
+        // No mock data - just show empty
+        setRecentTrades([]);
       }
     } catch {
-      setRecentTrades(generateMockTrades());
+      setRecentTrades([]);
     }
   };
 
@@ -362,36 +406,4 @@ export default function TokenPage() {
   );
 }
 
-function generateMockToken(address: string) {
-  return {
-    mint: address,
-    name: 'Demo Token',
-    symbol: 'DEMO',
-    description: 'This is a demo token for testing purposes.',
-    image: null,
-    price: Math.random() * 0.0001,
-    price24hAgo: Math.random() * 0.0001,
-    marketCap: Math.random() * 50000 + 5000,
-    liquidity: Math.random() * 10000,
-    volume24h: Math.random() * 50000,
-    holders: Math.floor(Math.random() * 200) + 20,
-    createdAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
-    creatorWallet: 'Demo' + Math.random().toString(36).substring(2, 10),
-    deployedBy: 'Platform' + Math.random().toString(36).substring(2, 10),
-    platform: 'Space Lab',
-    graduated: false,
-    twitter: null,
-    telegram: null,
-    website: null,
-  };
-}
 
-function generateMockTrades() {
-  return Array(10).fill(null).map((_, i) => ({
-    type: Math.random() > 0.5 ? 'buy' : 'sell',
-    amount: Math.random() * 1000000,
-    price: Math.random() * 0.0001,
-    timestamp: new Date(Date.now() - i * 60000 * Math.random() * 30).toISOString(),
-    wallet: 'Demo' + Math.random().toString(36).substring(2, 12),
-  }));
-}

@@ -70,14 +70,8 @@ export default function HomePage() {
         setStats(data);
       }
     } catch (error) {
-      // Use mock stats for demo
-      setStats({
-        totalVolume: 142500000,
-        totalTokens: 8421,
-        totalTraders: 52300,
-        totalEarnings: 712500,
-        volumeChange: 12.5
-      });
+      console.error('Failed to fetch stats:', error);
+      // Keep initial zero values - no mock data
     }
   };
 
@@ -201,8 +195,8 @@ export default function HomePage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all whitespace-nowrap ${activeTab === tab.id
-                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
               >
                 {tab.label}

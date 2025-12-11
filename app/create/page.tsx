@@ -11,7 +11,7 @@ export default function CreateTokenPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
-  
+
   const [formData, setFormData] = useState({
     name: '',
     symbol: '',
@@ -64,13 +64,13 @@ export default function CreateTokenPage() {
       // Upload image
       const imageFormData = new FormData();
       imageFormData.append('file', formData.image);
-      
+
       toast.loading('Uploading image...', { id: toastId });
       const imageRes = await fetch('/api/launch/metadata', {
         method: 'POST',
         body: imageFormData
       });
-      
+
       if (!imageRes.ok) throw new Error('Failed to upload image');
       const { imageUrl } = await imageRes.json();
 
@@ -90,26 +90,26 @@ export default function CreateTokenPage() {
         const error = await response.json();
         throw new Error(error.error || 'Failed to create token');
       }
-      
+
       const { mint, pumpFunUrl, signature } = await response.json();
-      
+
       toast.dismiss(toastId);
       toast.success(
         <div>
           <p className="font-semibold">Token launched successfully!</p>
           <p className="text-xs text-gray-400 mt-1">CA: {mint.slice(0, 8)}...{mint.slice(-8)}</p>
           <div className="flex gap-2 mt-2">
-            <a 
-              href={pumpFunUrl} 
-              target="_blank" 
+            <a
+              href={pumpFunUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 text-sm hover:underline"
             >
               View on Pump.fun →
             </a>
-            <a 
-              href={`https://solscan.io/tx/${signature}`} 
-              target="_blank" 
+            <a
+              href={`https://solscan.io/tx/${signature}`}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 text-sm hover:underline"
             >
@@ -119,9 +119,9 @@ export default function CreateTokenPage() {
         </div>,
         { duration: 10000 }
       );
-      
+
       router.push(`/token/${mint}`);
-      
+
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(error.message || 'Failed to create token');
@@ -138,7 +138,7 @@ export default function CreateTokenPage() {
           <p className="text-gray-400 mb-8">
             Launch fee: 0.02 SOL • Deployed with our authority • Appears on Pump.fun
           </p>
-          
+
           <div className="space-y-6">
             {/* Name & Symbol */}
             <div className="grid grid-cols-2 gap-4">
@@ -149,14 +149,14 @@ export default function CreateTokenPage() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors"
                   placeholder="Doge Killer"
                   maxLength={MAX_NAME_LENGTH}
                 />
                 <p className="text-xs text-gray-500 mt-1">{formData.name.length}/{MAX_NAME_LENGTH}</p>
               </div>
-              
+
               <div>
                 <label className="block text-gray-400 text-sm mb-2">
                   Symbol <span className="text-red-500">*</span>
@@ -164,7 +164,7 @@ export default function CreateTokenPage() {
                 <input
                   type="text"
                   value={formData.symbol}
-                  onChange={(e) => setFormData({...formData, symbol: e.target.value.toUpperCase()})}
+                  onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
                   className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors"
                   placeholder="DKILL"
                   maxLength={MAX_SYMBOL_LENGTH}
@@ -180,7 +180,7 @@ export default function CreateTokenPage() {
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors resize-none"
                 rows={4}
                 placeholder="Describe your token's mission..."
@@ -209,9 +209,9 @@ export default function CreateTokenPage() {
                   className="flex items-center justify-center w-full h-40 bg-[#0A0A0B] border-2 border-dashed border-[#1F1F22] rounded-xl cursor-pointer hover:border-purple-600 transition-colors overflow-hidden"
                 >
                   {imagePreview ? (
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
                       className="h-full w-full object-contain"
                     />
                   ) : (
@@ -237,12 +237,12 @@ export default function CreateTokenPage() {
                 <input
                   type="text"
                   value={formData.twitter}
-                  onChange={(e) => setFormData({...formData, twitter: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
                   className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors"
                   placeholder="https://twitter.com/yourtoken"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-400 text-sm mb-2">
                   Telegram
@@ -250,12 +250,12 @@ export default function CreateTokenPage() {
                 <input
                   type="text"
                   value={formData.telegram}
-                  onChange={(e) => setFormData({...formData, telegram: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
                   className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors"
                   placeholder="https://t.me/yourgroup"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-400 text-sm mb-2">
                   Website
@@ -263,23 +263,13 @@ export default function CreateTokenPage() {
                 <input
                   type="text"
                   value={formData.website}
-                  onChange={(e) => setFormData({...formData, website: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   className="w-full bg-[#0A0A0B] border border-[#1F1F22] rounded-xl px-4 py-3 text-white focus:border-purple-600 focus:outline-none transition-colors"
                   placeholder="https://yourtoken.com"
                 />
               </div>
             </div>
 
-            {/* Info Box */}
-            <div className="bg-purple-900/20 border border-purple-600/30 rounded-xl p-4">
-              <h4 className="text-purple-400 font-semibold text-sm mb-2">💡 What happens when you launch?</h4>
-              <ul className="text-purple-200 text-xs space-y-1">
-                <li>• Token is deployed with OUR platform wallet as authority</li>
-                <li>• Token appears on Pump.fun automatically</li>
-                <li>• Anyone can buy/sell through Jupiter (we earn 0.5% referral)</li>
-                <li>• Token graduates to Raydium at ~$69K market cap</li>
-              </ul>
-            </div>
 
             {/* Warning Box */}
             <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-xl p-4">
